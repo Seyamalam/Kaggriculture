@@ -37,15 +37,17 @@ def evaluate_promotion(
     min_win_rate: float,
     min_wilson_lower: float,
     min_mean_margin: float,
+    min_seat_win_rate: float,
 ) -> dict[str, Any]:
     """Run the suite and return a JSON-serializable promotion decision."""
     if not opponents:
         raise ValueError("at least one opponent is required")
-    if pairs <= 0:
-        raise ValueError("pairs must be positive")
+    if pairs < 2:
+        raise ValueError("pairs must be at least 2 so both seed halves are non-empty")
     for name, value in (
         ("min_win_rate", min_win_rate),
         ("min_wilson_lower", min_wilson_lower),
+        ("min_seat_win_rate", min_seat_win_rate),
     ):
         if not 0.0 <= value <= 1.0:
             raise ValueError(f"{name} must be between 0 and 1")
@@ -57,11 +59,15 @@ def evaluate_promotion(
     diagnostic_totals: dict[str, int] = {}
 
     for opponent_index, opponent in enumerate(opponents):
+        # Each opponent owns a non-overlapping contiguous block of scenario
+        # seeds. This prevents the same town/weed realization from creating
+        # hidden correlation across the entire suite.
+        opponent_seed = seed + opponent_index * pairs
         result = run_paired_tournament(
             resolved_candidate,
             resolve_agent(opponent),
             pairs=pairs,
-            seed=seed,
+            seed=opponent_seed,
         )
         episodes = list(result.get("episodes", []))
         paired_results = list(result.get("pairs", []))
@@ -69,11 +75,81 @@ def evaluate_promotion(
         all_pairs.extend({**pair, "opponent": opponent} for pair in paired_results)
         _add_totals(diagnostic_totals, result.get("diagnostic_totals", {}))
 
+        episode_count_for_opponent = len(episodes)
+        wins_for_opponent = sum(int(episode.get("win", 0)) for episode in episodes)
+        ties_for_opponent = sum(int(episode.get("tie", 0)) for episode in episodes)
+        margins_for_opponent = [float(episode["margin"]) for episode in episodes]
+        wilson_for_opponent = _wilson_interval(wins_for_opponent, episode_count_for_opponent)
+        seat_episodes = {
+            seat: [episode for episode in episodes if int(episode.get("candidate_seat", -1)) == seat]
+            for seat in (0, 1)
+        }
+        seat_wins = {
+            seat: sum(int(episode.get("win", 0)) for episode in seat_episodes[seat])
+            for seat in (0, 1)
+        }
+        seat_win_rates = {
+            seat: seat_wins[seat] / len(seat_episodes[seat]) if seat_episodes[seat] else 0.0
+            for seat in (0, 1)
+        }
+        midpoint = len(paired_results) // 2
+        first_half = paired_results[:midpoint]
+        second_half = paired_results[midpoint:]
+        first_half_margin = mean(float(pair["paired_margin"]) for pair in first_half)
+        second_half_margin = mean(float(pair["paired_margin"]) for pair in second_half)
+        opponent_invalid = sum(
+            1
+            for episode in episodes
+            if any(str(status) != "DONE" for status in episode.get("statuses", []))
+            or len(episode.get("statuses", [])) != 2
+        )
+        opponent_diagnostics = result.get("diagnostic_totals", {})
+        opponent_zero_terminal = all(
+            opponent_diagnostics.get(key, 0) == 0
+            for key in (
+                "terminal_unsold_items",
+                "terminal_seed_cost",
+                "terminal_field_yield_units",
+                "terminal_non_cash_value",
+            )
+        )
+        opponent_mean_margin = mean(margins_for_opponent)
+        opponent_checks = {
+            "no_invalid_episodes": opponent_invalid == 0,
+            "zero_terminal_waste": opponent_zero_terminal,
+            "zero_preventable_weeds": opponent_diagnostics.get("preventable_weeds", 0) == 0,
+            "zero_cash_days": opponent_diagnostics.get("zero_cash_days", 0) == 0,
+            "minimum_episode_win_rate": wins_for_opponent / episode_count_for_opponent >= min_win_rate,
+            "minimum_wilson_lower": wilson_for_opponent["low"] >= min_wilson_lower,
+            "minimum_seat_0_win_rate": seat_win_rates[0] >= min_seat_win_rate,
+            "minimum_seat_1_win_rate": seat_win_rates[1] >= min_seat_win_rate,
+            "positive_minimum_mean_margin": opponent_mean_margin > 0 and opponent_mean_margin >= min_mean_margin,
+            "positive_first_half_paired_margin": first_half_margin > 0,
+            "positive_second_half_paired_margin": second_half_margin > 0,
+        }
+        opponent_checks["overall"] = all(opponent_checks.values())
         summary = {key: value for key, value in result.items() if key != "episodes"}
         opponent_summaries.append(
             {
                 "opponent_index": opponent_index,
                 "opponent": opponent,
+                "base_seed": opponent_seed,
+                "metrics": {
+                    "episodes_played": episode_count_for_opponent,
+                    "episode_wins": wins_for_opponent,
+                    "episode_ties": ties_for_opponent,
+                    "episode_losses": episode_count_for_opponent - wins_for_opponent - ties_for_opponent,
+                    "episode_win_rate": wins_for_opponent / episode_count_for_opponent,
+                    "episode_win_rate_wilson_95": wilson_for_opponent,
+                    "mean_episode_margin": opponent_mean_margin,
+                    "seat_wins": {str(seat): seat_wins[seat] for seat in (0, 1)},
+                    "seat_win_rates": {str(seat): seat_win_rates[seat] for seat in (0, 1)},
+                    "first_half_pairs": len(first_half),
+                    "first_half_mean_paired_margin": first_half_margin,
+                    "second_half_pairs": len(second_half),
+                    "second_half_mean_paired_margin": second_half_margin,
+                },
+                "checks": opponent_checks,
                 "summary": summary,
             }
         )
@@ -112,9 +188,9 @@ def evaluate_promotion(
         "zero_terminal_waste": zero_terminal_waste,
         "zero_preventable_weeds": diagnostic_totals.get("preventable_weeds", 0) == 0,
         "zero_cash_days": diagnostic_totals.get("zero_cash_days", 0) == 0,
-        "minimum_episode_win_rate": win_rate >= min_win_rate,
-        "minimum_wilson_lower": wilson["low"] >= min_wilson_lower,
-        "minimum_mean_margin": mean(episode_margins) >= min_mean_margin,
+        "every_opponent_independently_passes": all(
+            opponent["checks"]["overall"] for opponent in opponent_summaries
+        ),
     }
     checks["overall"] = all(checks.values())
 
@@ -127,6 +203,7 @@ def evaluate_promotion(
             "min_win_rate": min_win_rate,
             "min_wilson_lower": min_wilson_lower,
             "min_mean_margin": min_mean_margin,
+            "min_seat_win_rate": min_seat_win_rate,
         },
         "aggregate": {
             "episodes_played": episode_count,
@@ -136,7 +213,10 @@ def evaluate_promotion(
             "episode_win_rate": win_rate,
             "episode_tie_rate": episode_ties / episode_count,
             "episode_loss_rate": episode_losses / episode_count,
-            "episode_win_rate_wilson_95": wilson,
+            "episode_win_rate_wilson_95": {
+                **wilson,
+                "interpretation": "descriptive_only_correlated_pooled_episodes_do_not_drive_promotion",
+            },
             "paired_results": paired_count,
             "paired_wins": paired_wins,
             "paired_ties": paired_ties,
@@ -167,6 +247,7 @@ def main() -> None:
     parser.add_argument("--min-win-rate", type=float, default=0.5)
     parser.add_argument("--min-wilson-lower", type=float, default=0.0)
     parser.add_argument("--min-mean-margin", type=float, default=0.0)
+    parser.add_argument("--min-seat-win-rate", type=float, default=0.55)
     args = parser.parse_args()
 
     report = evaluate_promotion(
@@ -177,6 +258,7 @@ def main() -> None:
         min_win_rate=args.min_win_rate,
         min_wilson_lower=args.min_wilson_lower,
         min_mean_margin=args.min_mean_margin,
+        min_seat_win_rate=args.min_seat_win_rate,
     )
     rendered = json.dumps(report, indent=2)
     print(rendered)
