@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
-from statistics import mean
+from statistics import mean, median
 from typing import Any, Callable
 
 from kaggle_environments import make
@@ -21,6 +21,28 @@ SEED_COSTS = {"WHEAT": 10, "CARROT": 20, "TOMATO": 50, "STRAWBERRY": 100, "MELON
 ANIMAL_PRODUCTS = {"GOOSE": "EGG", "COW": "MILK", "SHEEP": "WOOL"}
 PRODUCTS = (*SEED_COSTS, "EGG", "MILK", "WOOL", "FERTILIZER")
 Agent = str | Callable[[dict[str, Any]], dict[str, Any]]
+
+
+def _wilson_interval(successes: int, trials: int, z: float = 1.959963984540054) -> dict[str, float]:
+    """Return a two-sided Wilson score interval for a Bernoulli proportion."""
+    if trials < 0 or successes < 0 or successes > trials:
+        raise ValueError("expected 0 <= successes <= trials")
+    if trials == 0:
+        return {"low": 0.0, "high": 0.0}
+    proportion = successes / trials
+    z_squared = z * z
+    denominator = 1.0 + z_squared / trials
+    center = (proportion + z_squared / (2.0 * trials)) / denominator
+    radius = (
+        z
+        * (
+            proportion * (1.0 - proportion) / trials
+            + z_squared / (4.0 * trials * trials)
+        )
+        ** 0.5
+        / denominator
+    )
+    return {"low": max(0.0, center - radius), "high": min(1.0, center + radius)}
 
 
 def _inventory_counts(private: dict[str, Any]) -> dict[str, int]:
@@ -239,19 +261,37 @@ def run_paired_tournament(
         "terminal_field_yield_market_value",
         "terminal_non_cash_value",
     )
+    episode_count = len(episodes)
+    episode_wins = sum(int(episode["win"]) for episode in episodes)
+    episode_ties = sum(int(episode["tie"]) for episode in episodes)
+    pair_count = len(paired_results)
+    paired_wins = sum(int(pair["paired_win"]) for pair in paired_results)
+    paired_ties = sum(int(pair["paired_tie"]) for pair in paired_results)
     return {
         "seed_pairs": pairs,
-        "episodes_played": len(episodes),
+        "episodes_played": episode_count,
         "base_seed": seed,
         "episode_steps": episode_steps,
-        "episode_wins": sum(int(episode["win"]) for episode in episodes),
-        "episode_ties": sum(int(episode["tie"]) for episode in episodes),
-        "paired_wins": sum(int(pair["paired_win"]) for pair in paired_results),
-        "paired_ties": sum(int(pair["paired_tie"]) for pair in paired_results),
+        "episode_wins": episode_wins,
+        "episode_ties": episode_ties,
+        "episode_win_rate": episode_wins / episode_count,
+        "episode_tie_rate": episode_ties / episode_count,
+        "episode_loss_rate": (episode_count - episode_wins - episode_ties) / episode_count,
+        # Ties remain explicit non-wins; they are not silently scored as half
+        # a win in either the point estimate or the Wilson interval.
+        "episode_win_rate_wilson_95": _wilson_interval(episode_wins, episode_count),
+        "paired_wins": paired_wins,
+        "paired_ties": paired_ties,
+        "paired_win_rate": paired_wins / pair_count,
+        "paired_tie_rate": paired_ties / pair_count,
+        "paired_loss_rate": (pair_count - paired_wins - paired_ties) / pair_count,
         "mean_ours": mean(float(episode["ours"]) for episode in episodes),
         "mean_theirs": mean(float(episode["theirs"]) for episode in episodes),
         "mean_episode_margin": mean(float(episode["margin"]) for episode in episodes),
         "mean_paired_margin": mean(float(pair["paired_margin"]) for pair in paired_results),
+        "median_ours": median(float(episode["ours"]) for episode in episodes),
+        "median_theirs": median(float(episode["theirs"]) for episode in episodes),
+        "median_episode_margin": median(float(episode["margin"]) for episode in episodes),
         "seat_summary": {
             str(seat): {
                 "wins": sum(int(episode["win"]) for episode in episodes if episode["candidate_seat"] == seat),

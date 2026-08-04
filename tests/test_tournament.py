@@ -4,11 +4,13 @@ import json
 import sys
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from scripts.frozen_opponents import animal_specialist, crop_specialist, diversified_baseline
-from scripts.tournament import run_game, run_paired_tournament
+from scripts.tournament import _wilson_interval, run_game, run_paired_tournament
 
 
 def pass_agent(obs):
@@ -48,9 +50,27 @@ def test_paired_tournament_reuses_each_seed_in_both_seats(tmp_path):
     assert [episode["seed"] for episode in report["episodes"]] == [77, 77, 78, 78]
     assert [episode["candidate_seat"] for episode in report["episodes"]] == [0, 1, 0, 1]
     assert report["episodes_played"] == 4
+    assert report["episode_win_rate"] == 0.0
+    assert report["episode_tie_rate"] == 1.0
+    assert report["episode_loss_rate"] == 0.0
+    assert report["paired_win_rate"] == 0.0
+    assert report["paired_tie_rate"] == 1.0
+    assert report["paired_loss_rate"] == 0.0
+    assert report["median_ours"] == 3000.0
+    assert report["median_theirs"] == 3000.0
+    assert report["median_episode_margin"] == 0.0
+    assert report["episode_win_rate_wilson_95"]["low"] == 0.0
+    assert 0.48 < report["episode_win_rate_wilson_95"]["high"] < 0.50
     replay_files = sorted(tmp_path.glob("*.json"))
     assert len(replay_files) == 4
     assert all(json.loads(path.read_text(encoding="utf-8"))["name"] == "kaggriculture" for path in replay_files)
+
+
+def test_wilson_interval_matches_known_balanced_case():
+    interval = _wilson_interval(5, 10)
+
+    assert interval["low"] == pytest.approx(0.236593, abs=1e-6)
+    assert interval["high"] == pytest.approx(0.763407, abs=1e-6)
 
 
 def test_terminal_diagnostics_include_seed_cost_and_standing_yield():
