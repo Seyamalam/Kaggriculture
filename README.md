@@ -18,7 +18,7 @@ Kaggle submission `55245711` passed its server self-play validation (`COMPLETE`)
 
 The exact submitted v1 is preserved by Git commit `dd3bbec` and tag `submission-55245711`. Development candidates are not promoted to `main.py` or submitted to Kaggle until they pass deterministic paired-seat gates against the frozen local opponent pool.
 
-Current development status: the first mixed-livestock candidate and a narrower crop/seed-cap prototype both failed paired head-to-head gates against v1. Their results are retained in `reports/iteration-2-ablation.md`; neither was submitted.
+Current development status: early mixed-livestock and crop/seed-cap prototypes failed and were rejected. The four-sheep V4 candidate subsequently passed a 250-episode local pool gate with 241 wins, including 43/50 against submitted v1 and 48/50 against V3, while all safety diagnostics remained zero. V4 is still withheld from Kaggle pending an independent readiness audit and a stronger adversarial opponent; see `reports/v4-promotion-gate.md`.
 
 ## Repository map
 
