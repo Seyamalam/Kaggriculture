@@ -1,0 +1,74 @@
+{
+  "competition_id": 147734,
+  "slug": "kaggriculture",
+  "title": "Kaggriculture",
+  "type": "featured_simulation",
+  "sponsor": "Google LLC",
+  "host": "Kaggle",
+  "prize_usd": 50000,
+  "prizes": {
+    "places": 10,
+    "usd_each": 5000
+  },
+  "timeline_utc": {
+    "page_start_date": "2026-07-29T00:00:00Z",
+    "entry_deadline": "2026-09-23T23:59:00Z",
+    "team_merger_deadline": "2026-09-23T23:59:00Z",
+    "final_submission_deadline": "2026-09-30T23:59:00Z",
+    "approximate_final_games_end": "2026-10-15T23:59:00Z"
+  },
+  "evaluation": {
+    "daily_submission_limit": 5,
+    "active_and_final_submissions": 2,
+    "validation": "self_play_episode",
+    "rating": "skill_rating_from_win_loss_tie",
+    "final_ranking": "Bradley-Terry tournament",
+    "private_leaderboard": false
+  },
+  "game_defaults": {
+    "players": 2,
+    "episode_steps": 720,
+    "days": 30,
+    "turns_per_day": 24,
+    "board_size": 10,
+    "starting_money": 3000,
+    "shed_capacity": 100,
+    "max_market_orders_per_turn": 10
+  },
+  "submission": {
+    "entry_file": "main.py",
+    "entry_function": "agent",
+    "multi_file_format": "tar.gz",
+    "network_ingress_egress": false
+  },
+  "local_environment": {
+    "python": "3.12",
+    "kaggle_environments": "1.32.3",
+    "engine_sha256": "2f5f94e3da0f007f6d7628e30889bd19c83716183eeaa05b4922430db5021737",
+    "agent_sha256": "04870c4342d289992cea2a5e3085588708852686eb720a090249ae2a705a3e24"
+  },
+  "latest_submission": {
+    "submission_id": 55245711,
+    "validation_episode_id": 89974785,
+    "description": "deterministic planner v1 04870c43",
+    "status": "COMPLETE",
+    "initial_public_score": 600.0,
+    "current_public_score": 676.3,
+    "first_public_episode": {
+      "episode_id": 89975326,
+      "opponent": "yankang_XZK",
+      "agent_reward": 28848.0,
+      "opponent_reward": 21140.0,
+      "result": "win"
+    },
+    "submitted_at": "2026-08-04T16:55:22.440000",
+    "daily_submissions_remaining_after_upload": 4
+  },
+  "verified_at": "2026-08-04T00:00:00+06:00",
+  "sources": [
+    "https://www.kaggle.com/competitions/kaggriculture/overview",
+    "https://www.kaggle.com/competitions/kaggriculture/data",
+    "https://www.kaggle.com/competitions/kaggriculture/rules",
+    "https://www.kaggle.com/competitions/kaggriculture/overview/evaluation"
+  ]
+}

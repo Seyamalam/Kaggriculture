@@ -1,0 +1,12 @@
+.DS_Store
+.pytest_cache/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Downloaded competition material and generated artifacts
+data/raw/
+artifacts/
+replays/
+logs/
+submissions/
