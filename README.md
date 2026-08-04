@@ -2,15 +2,16 @@
 
 A reproducible, self-contained agent for Kaggle's [Kaggriculture competition](https://www.kaggle.com/competitions/kaggriculture/overview). Kaggriculture is a two-player farming simulation, not a supervised train/test prediction task. The deliverable is a `main.py` policy that earns more banked coins than its opponent after 720 turns.
 
-The current policy combines:
+The current V7 policy is the exact, attributed Apache-2.0 public V18/C20
+closed-loop policy. It combines:
 
 - deterministic task assignment for planting, watering, harvesting, weeds, and shed logistics;
 - opponent- and inventory-aware crop scoring using the published market curves;
 - cash-runway-aware daily hiring and staged land expansion;
 - seed accounting that avoids the simulator's all-or-nothing simultaneous-plant failure;
 - automatic liquidation and a defensive no-error fallback.
-- adaptive livestock expansion: eight sheep by default, or a latched
-  four-sheep/four-cow response to an early sheep-heavy opponent.
+- a three-quadrant, 12-hand production route with eight cows and six sheep;
+- public-state expert selection for route repair and market-order timing.
 
 ## Current result
 
@@ -20,7 +21,15 @@ Kaggle submission `55245711` passed its server self-play validation (`COMPLETE`)
 
 The exact submitted v1 is preserved by Git commit `dd3bbec` and tag `submission-55245711`. Development candidates are not promoted to `main.py` or submitted to Kaggle until they pass deterministic paired-seat gates against the frozen local opponent pool.
 
-Current development status: early mixed-livestock and crop/seed-cap prototypes failed and were rejected. V6 then passed a strict 50-episode paired-seat gate against the stronger V5 policy with 50 wins, a +9,880 mean margin, and zero safety failures. It also won both seats against open-loop traces of each public v1 loss. An independent GPT-5.6 Sol extra-high audit approved one monitored progress submission. Submission `55247685` passed server self-play validation with 66,939 rewards in both seats and no logged errors; its current 600.0 is the initial rating while public pairing is pending. See `reports/v6-release-gate.md` and `reports/submission-55247685.md`.
+Current development status: V7 is promoted and awaiting its first monitored
+submission. It beat submitted V6 in all 10 initial paired-seat episodes by
+118,341 coins on average, then won all 200 episodes in the extended frozen-pool
+screen. Ten mirror pairs averaged 130,031 coins without seat collapse. An
+independent GPT-5.6 Sol extra-high audit reproduced the integrity, runtime,
+reset, legality, and mirror checks and approved one monitored submission. A
+second agent independently rejected the newer public Hamburger V27 anchor: it
+lost 11 of 12 fresh head-to-head games against V7, and its source has no
+explicit redistribution license. See `reports/v7-public-meta-gate.md`.
 
 ## Repository map
 
@@ -76,7 +85,7 @@ before promoting a strategic change.
 ```bash
 uvx kaggle competitions submit kaggriculture \
   -f main.py \
-  -m "deterministic planner v1"
+  -m "public-meta v7 603175d3"
 ```
 
 After submission, validate the status, then inspect server episodes and logs before treating the result as usable:
@@ -92,7 +101,7 @@ uvx kaggle competitions logs EPISODE_ID AGENT_INDEX
 - Python: 3.12
 - `kaggle-environments`: 1.32.3
 - Environment source SHA-256: `2f5f94e3da0f007f6d7628e30889bd19c83716183eeaa05b4922430db5021737`
-- Current submitted agent SHA-256: `1464c72bba660d5c86d9c3295c7a5c17551241c0a2cb75f53fcf1159266aadcb`
+- Current promoted agent SHA-256: `603175d39f2857cbd618dc8f5ac9411e9fd234e3142777ec203342172f05a50e`
 - Default local seed sequence starts at `20260804`
 - The agent is deterministic for a given observation; environmental weeds and town shops remain stochastic.
 

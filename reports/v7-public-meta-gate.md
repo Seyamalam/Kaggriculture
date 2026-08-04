@@ -1,8 +1,8 @@
 # V7 public-meta reset
 
-Status: **unpromoted challenger**. V7 replaces incremental V6 tuning with an
-exact, attributed copy of the public Apache-2.0 V18/C20 policy. `main.py` still
-contains the submitted V6 policy until the independent release gate completes.
+Status: **promoted; GO for one monitored submission**. V7 replaces incremental
+V6 tuning with an exact, attributed copy of the public Apache-2.0 V18/C20
+policy. `main.py` and `agents/candidate_v7_public_v18.py` are byte-identical.
 
 ## Why the reset was necessary
 
@@ -59,16 +59,40 @@ but an exact public-meta copy should be expected to win roughly half its games
 against identical copies. Large wins against weak local policies do not imply a
 2,900 rating by themselves.
 
-## Remaining release gate
+## Extended release gate
 
-Before promotion or upload:
+The remaining checks were completed before promotion:
 
-1. Independently audit exact-source integrity, licensing, runtime, state reset,
-   action legality, and both-seat robustness.
-2. Run a larger unseen paired-seat gate against V6 and the frozen opponent pool.
-3. Replay all downloaded server-loss traces and representative top-meta traces.
-4. Compare exact V7 against an independent copy of the same public V18/C20
-   artifact; require mirror-scale cash and no systematic seat collapse.
-5. Promote the exact audited hash only; do not hybridize the route before the
-   first live measurement.
+1. An independent GPT-5.6 Sol extra-high audit verified the exact source hash,
+   Apache-2.0 attribution, standard-library-only runtime, state reset, action
+   legality, entrypoint, and both-seat robustness. Fresh action runtime was
+   0.029 ms mean, 0.033 ms p95, and 75 ms maximum under the one-second limit.
+2. The extended frozen-pool gate won 200/200 episodes and 100/100 paired
+   comparisons across V6 and three frozen opponent archetypes. All performance,
+   seat, and half-block thresholds passed. The report's strict `overall=false`
+   is solely the absolute-zero terminal-waste invariant: average terminal
+   non-cash value was about 143 coins, roughly 0.08% of mean bank.
+3. V7 beat both public V1 loss traces in both seats. Against Savko's current top
+   open-loop trace it lost by 5,925 and 6,547 coins. This is a real warning, but
+   the trace does not adapt after divergence and is not a ladder win-rate model.
+4. Ten fresh mirror pairs produced 96,579--157,829 banks, mean 130,031, with no
+   systematic seat collapse.
+5. `main.py` was promoted wholesale at SHA-256 `603175d39f2857cbd618dc8f5ac9411e9fd234e3142777ec203342172f05a50e`.
 
+## Newer public-anchor challenge
+
+Two independent agents evaluated Roman Tamrazov's public Hamburger V27 notebook
+before promotion. Its selected Anchor Exact policy lost 11 of 12 fresh paired
+head-to-head games against V7, averaging 124,170 versus V7's 129,024. A second
+four-pair run was 0--8 with a -5,721 mean margin. The anchor reduced the Savko
+open-loop deficit to roughly 2,600 coins but still lost both seats. None of its
+seven market/terminal overlays closed the gap; the notebook also contains an
+entrypoint-selection defect for appended overlays and no explicit SPDX or
+redistribution license. It was therefore rejected rather than vendored.
+
+## Decision
+
+Promote the exact audited V7 bytes and permit one monitored progress
+submission. This is strong evidence of a major improvement over V6, not a
+guarantee of a 2,900 ladder rating. Preserve the exact first live artifact so
+its public matches are attributable before attempting market-order hybrids.
