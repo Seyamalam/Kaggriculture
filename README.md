@@ -28,6 +28,7 @@ Current development status: early mixed-livestock and crop/seed-cap prototypes f
 |---|---|
 | `main.py` | Single-file Kaggle submission |
 | `agents/` | Immutable submitted baselines and development candidates |
+| `THIRD_PARTY_NOTICES.md` | Attribution and per-file licenses for imported public policies |
 | `scripts/tournament.py` | Seeded, slot-swapped local evaluation harness |
 | `tests/` | Full-episode validity and self-play tests |
 | `docs/competition.md` | Competition mechanics, evaluation, timeline, and submission contract |
