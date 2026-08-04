@@ -42,9 +42,9 @@ terminal non-cash value.
 
 ## Decision
 
-The local promotion checks pass, including a positive and high-confidence
-result against both v1 and v3. Submission is still withheld because the frozen
-pool's strongest independent opponent averages about 35k, below the 52k–62k
-rewards observed from the two ladder bots that beat v1. Before promotion, V4
-needs an independent code/mechanics audit and a stronger replay-inspired
-opponent or equivalent adversarial gate.
+The original local promotion checks pass, including a positive result against
+both v1 and v3. An independent readiness audit subsequently rejected this gate:
+the pool is too weak/correlated and the aggregate statistics can hide failure
+against a strong opponent. V4 also lost both seats to the recorded action trace
+of the 62k ladder opponent. See `reports/v4-independent-audit.md` for the
+replacement per-opponent gate. No submission was made.
