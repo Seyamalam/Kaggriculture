@@ -43,6 +43,7 @@ LAND_PRICES = (1_000, 2_000, 4_000)
 FIB_HIRE_COSTS = (1, 1, 2, 3, 5, 8, 13, 21, 34, 55)
 SHEEP_TILES = ((4, 3), (3, 4), (3, 3), (2, 4))
 SHEEP_COST = 500
+FALLBACK_COUNT = 0
 
 
 def _shape(name: str, value: float) -> float:
@@ -238,6 +239,9 @@ def _unit_actions(obs: dict[str, Any]) -> tuple[list[Any], list[list[Any]]]:
     board_size = len(farm["tiles"])
     half = board_size // 2
     shed_access = ((half - 1, half - 1), (half, half - 1), (half - 1, half), (half, half))
+    pickup_access = tuple(
+        (x, y) for x, y in shed_access if farm["tiles"][y][x] != "LOCKED"
+    )
 
     sheep_tiles: list[tuple[int, int, dict[str, Any]]] = []
     empty_pastures: list[tuple[int, int]] = []
@@ -272,7 +276,8 @@ def _unit_actions(obs: dict[str, Any]) -> tuple[list[Any], list[list[Any]]]:
     # Finish purchased-animal placement and daily feeding before any crop work.
     empty_pastures = assign_carriers("SHEEP", empty_pastures, ["PLACE", "SHEEP"])
     hungry = [(x, y) for x, y, tile in sheep_tiles if not tile.get("fed_today", False)]
-    hungry = assign_carriers("WHEAT", hungry, ["FEED"])
+    if day < 29:
+        hungry = assign_carriers("WHEAT", hungry, ["FEED"])
 
     # Harvested goods must enter the shed before market orders can sell them.
     # Route carriers home immediately; otherwise a large harvest silently loses
@@ -298,12 +303,12 @@ def _unit_actions(obs: dict[str, Any]) -> tuple[list[Any], list[list[Any]]]:
     # Pull service inventory from the shed. One feed carrier can visit adjacent
     # pastures in succession; sheep pickups are distributed one per carrier.
     def assign_pickup(item: str, quantity: int) -> None:
-        if quantity <= 0 or not remaining_units:
+        if quantity <= 0 or not remaining_units or not pickup_access:
             return
         _, unit, target = min(
             (_distance(positions[i], access), i, access)
             for i in remaining_units
-            for access in shed_access
+            for access in pickup_access
         )
         assignments[unit] = (target[0], target[1], ["PICKUP", item, quantity])
         remaining_units.remove(unit)
@@ -487,13 +492,20 @@ def _market_actions(obs: dict[str, Any]) -> list[list[Any]]:
     return orders[:10]
 
 
+def _agent_impl(obs: dict[str, Any]) -> dict[str, Any]:
+    """Run the policy without masking exceptions, for local validation."""
+    farmer, hands = _unit_actions(obs)
+    market = _market_actions(obs)
+    return {"farmer": farmer, "hands": hands, "market": market}
+
+
 def agent(obs: dict[str, Any]) -> dict[str, Any]:
-    """Kaggle entry point."""
+    """Kaggle entry point with an observable defensive fallback."""
+    global FALLBACK_COUNT
     try:
-        farmer, hands = _unit_actions(obs)
-        market = _market_actions(obs)
-        return {"farmer": farmer, "hands": hands, "market": market}
+        return _agent_impl(obs)
     except Exception:
+        FALLBACK_COUNT += 1
         # Invalid actions are silent no-ops, but an exception would invalidate
         # the whole submission.  A defensive PASS preserves ladder eligibility.
         farms = obs.get("farms", [])
