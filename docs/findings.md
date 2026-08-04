@@ -11,8 +11,9 @@ Experiments are pinned to `kaggle-environments==1.32.3`; the installed `kaggricu
 Observed source-versus-documentation differences:
 
 1. Organizer prose says a fed-and-cared animal banks +2 care bonus; the installed engine increments `pending_care_bonus` by +1.
-2. Live discussions report additional mechanics discrepancies and a recently rolling hired-hand fix. The server version may change during the competition.
-3. Raw CLI page content leaves runtime resource tokens unresolved, while the rendered page currently fills them with concrete values.
+2. Organizer prose describes fertilizer as non-sellable, but the pinned engine includes `FERTILIZER` in `PRODUCTS` and accepts it in `SELL` orders.
+3. Live discussions report additional mechanics discrepancies and a recently rolling hired-hand fix. The server version may change during the competition.
+4. Raw CLI page content leaves runtime resource tokens unresolved, while the rendered page currently fills them with concrete values.
 
 These are version risks, not invitations to access hidden state. The policy does not depend on the CARE discrepancy or other questionable exploits.
 
@@ -34,6 +35,7 @@ These are version risks, not invitations to access hidden state. The policy does
 - The local opponent pool is still shallow; built-ins are plumbing baselines, not competitive proxies.
 - Seed purchases are capacity-based rather than throughput-based. The first three public episodes ended with $1,120–$2,330 of seed capital stranded at zero terminal value.
 - The original local diagnostic excluded seeds from terminal inventory and overstated liquidation quality. Promotion reports must include terminal seed cost separately.
+- Broad mixed-livestock and naive seed-cap candidates both failed paired v1 gates. Replay economics support testing a bounded sheep-only module next rather than adding all animal types simultaneously.
 
 ## Pre-submission validation
 
