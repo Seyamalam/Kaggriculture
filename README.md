@@ -14,13 +14,16 @@ The current policy combines:
 
 The first promoted candidate completed every local validation episode. In the 25-seed, slot-swapped pre-submission gate against the built-in `starter`, it won **25/25** with mean final bank **40,499** versus **3,497**, zero preventable crop losses, zero cash-collapse days, and zero terminal unsold items. It also won 25/25 against `random`. This is plumbing evidence, not a leaderboard-performance claim: strong evaluation requires a larger frozen opponent pool.
 
-Kaggle submission `55245711` passed its server self-play validation (`COMPLETE`) with no stdout/stderr errors, then won its first public episode 28,848–21,140. Its score moved from the default 600 to 676.3. A single ladder game is not a reliable rank estimate.
+Kaggle submission `55245711` passed its server self-play validation (`COMPLETE`) with no stdout/stderr errors. It won its first public episode, then lost the next two; the live rating moved from the default 600 to 676.3 and then 511.8. The losses exposed the intended gap between a plumbing baseline and a competitive policy: v1 uses crops and hired hands but no livestock or fertilizer, and it strands purchased seeds at the terminal boundary.
+
+The exact submitted v1 is preserved by Git commit `dd3bbec` and tag `submission-55245711`. Development candidates are not promoted to `main.py` or submitted to Kaggle until they pass deterministic paired-seat gates against the frozen local opponent pool.
 
 ## Repository map
 
 | Path | Purpose |
 |---|---|
 | `main.py` | Single-file Kaggle submission |
+| `agents/` | Immutable baselines and unpromoted development candidates |
 | `scripts/tournament.py` | Seeded, slot-swapped local evaluation harness |
 | `tests/` | Full-episode validity and self-play tests |
 | `docs/competition.md` | Competition mechanics, evaluation, timeline, and submission contract |
@@ -30,7 +33,7 @@ Kaggle submission `55245711` passed its server self-play validation (`COMPLETE`)
 | `metadata/competition.json` | Machine-readable competition metadata |
 | `research/` | Recorded independent Kimi K3 reviews |
 
-The authenticated competition download is intentionally ignored by Git because the rules restrict redistribution. Re-download it locally when needed.
+The authenticated competition download, server logs, and replays are intentionally ignored by Git because the rules restrict redistribution. Re-download them locally when needed. Repository code is MIT-licensed and publicly mirrored through the competition's Kaggle surfaces as required by the public-code-sharing rule.
 
 ## Setup
 

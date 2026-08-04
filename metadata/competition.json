@@ -53,18 +53,34 @@
     "description": "deterministic planner v1 04870c43",
     "status": "COMPLETE",
     "initial_public_score": 600.0,
-    "current_public_score": 676.3,
-    "first_public_episode": {
-      "episode_id": 89975326,
-      "opponent": "yankang_XZK",
-      "agent_reward": 28848.0,
-      "opponent_reward": 21140.0,
-      "result": "win"
-    },
+    "current_public_score": 511.8,
+    "public_episodes": [
+      {
+        "episode_id": 89975326,
+        "opponent": "yankang_XZK",
+        "agent_reward": 28848.0,
+        "opponent_reward": 21140.0,
+        "result": "win"
+      },
+      {
+        "episode_id": 89975956,
+        "opponent": "Aromal vK",
+        "agent_reward": 24965.0,
+        "opponent_reward": 62006.0,
+        "result": "loss"
+      },
+      {
+        "episode_id": 89976616,
+        "opponent": "Vignesh Murugan",
+        "agent_reward": 32762.0,
+        "opponent_reward": 52983.0,
+        "result": "loss"
+      }
+    ],
     "submitted_at": "2026-08-04T16:55:22.440000",
     "daily_submissions_remaining_after_upload": 4
   },
-  "verified_at": "2026-08-04T00:00:00+06:00",
+  "verified_at": "2026-08-04T23:18:09+06:00",
   "sources": [
     "https://www.kaggle.com/competitions/kaggriculture/overview",
     "https://www.kaggle.com/competitions/kaggriculture/data",

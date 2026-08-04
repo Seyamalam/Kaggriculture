@@ -7,6 +7,7 @@
 - Submission status: `COMPLETE`
 - Initial public score: `600.0`
 - Public score after first ladder episode: `676.3`
+- Public score after three ladder episodes: `511.8`
 - Daily submission slots remaining immediately after upload: 4
 
 ## Validation episode
@@ -32,4 +33,11 @@
 - Result: win
 - Updated public score: 676.3
 
-One public win is useful server-compatibility evidence, not a stable estimate of competitive rank.
+## Subsequent public ladder episodes
+
+| Episode | Opponent | Agent coins | Opponent coins | Result |
+|---:|---|---:|---:|---|
+| `89975956` | Aromal vK | 24,965 | 62,006 | loss |
+| `89976616` | Vignesh Murugan | 32,762 | 52,983 | loss |
+
+Both losses completed normally. Replay inspection found no illegal actions, but v1 used no livestock or fertilizer and ended with economically material unused seeds. Its authenticated live score was `511.8` at 2026-08-04T23:18:09+06:00. The submission remains a plumbing baseline, not a competitive champion.
