@@ -54,13 +54,19 @@ Kaggle credentials must be configured separately; never commit tokens or browser
 ## Verify
 
 ```bash
+uv run pre-commit install
+uv run pre-commit run --all-files
 uv run pytest -q
 uv run python scripts/tournament.py --opponent starter --games 10
 uv run python scripts/tournament.py --opponent random --games 10
 uv run python scripts/tournament.py --opponent main.py --games 10
 ```
 
-Every comparison swaps player slots. Increase the game count and use a frozen scripted-opponent pool before promoting a strategic change.
+The repository deliberately uses a local pre-commit test hook instead of GitHub
+Actions or another hosted CI/CD workflow. Install it once after cloning; every
+commit will then run the full test suite. Every tournament comparison swaps
+player slots. Increase the game count and use a frozen scripted-opponent pool
+before promoting a strategic change.
 
 ## Submit
 
