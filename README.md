@@ -21,15 +21,17 @@ Kaggle submission `55245711` passed its server self-play validation (`COMPLETE`)
 
 The exact submitted v1 is preserved by Git commit `dd3bbec` and tag `submission-55245711`. Development candidates are not promoted to `main.py` or submitted to Kaggle until they pass deterministic paired-seat gates against the frozen local opponent pool.
 
-Current development status: V7 is promoted and awaiting its first monitored
-submission. It beat submitted V6 in all 10 initial paired-seat episodes by
+Current development status: V7 is promoted and live as Kaggle submission
+`55248314`. It beat submitted V6 in all 10 initial paired-seat episodes by
 118,341 coins on average, then won all 200 episodes in the extended frozen-pool
 screen. Ten mirror pairs averaged 130,031 coins without seat collapse. An
 independent GPT-5.6 Sol extra-high audit reproduced the integrity, runtime,
 reset, legality, and mirror checks and approved one monitored submission. A
 second agent independently rejected the newer public Hamburger V27 anchor: it
 lost 11 of 12 fresh head-to-head games against V7, and its source has no
-explicit redistribution license. See `reports/v7-public-meta-gate.md`.
+explicit redistribution license. Kaggle validation completed on engine 1.32.4
+with both seats DONE, banks 111,277 and 110,880, and zero logged errors. See
+`reports/v7-public-meta-gate.md` and `reports/submission-55248314.md`.
 
 ## Repository map
 
