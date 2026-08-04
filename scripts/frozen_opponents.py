@@ -436,6 +436,14 @@ def animal_specialist(obs: dict[str, Any]) -> dict[str, Any]:
     # Keep feed wheat instead of reflexively selling it.  Other production is
     # liquidated continuously to avoid the shed cap and premium-product gluts.
     market = [order for order in _market_sales(obs) if order[1] != "WHEAT"]
+    # Keep a small, demand-backed fertilizer reserve for the pickup task above
+    # and sell everything beyond it.  Unit actions execute before market
+    # orders, so a successful pickup removes the reserve before this sale is
+    # processed and the quantities remain consistent.
+    fertilizer_reserve = min(6, needs_fertilizer)
+    fertilizer_surplus = max(0, int(shed.get("FERTILIZER", 0)) - fertilizer_reserve)
+    if fertilizer_surplus:
+        market.append(["SELL", "FERTILIZER", fertilizer_surplus])
     unlocked = len(farm.get("unlocked_quadrants", ["NW"]))
     workload = len(all_animals) * 3 + sum(
         1

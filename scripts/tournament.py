@@ -19,7 +19,7 @@ except ModuleNotFoundError:  # pragma: no cover - exercised by the CLI smoke tes
 ROOT = Path(__file__).resolve().parents[1]
 SEED_COSTS = {"WHEAT": 10, "CARROT": 20, "TOMATO": 50, "STRAWBERRY": 100, "MELON": 80}
 ANIMAL_PRODUCTS = {"GOOSE": "EGG", "COW": "MILK", "SHEEP": "WOOL"}
-PRODUCTS = (*SEED_COSTS, "EGG", "MILK", "WOOL")
+PRODUCTS = (*SEED_COSTS, "EGG", "MILK", "WOOL", "FERTILIZER")
 Agent = str | Callable[[dict[str, Any]], dict[str, Any]]
 
 

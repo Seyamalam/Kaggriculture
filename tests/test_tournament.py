@@ -30,6 +30,11 @@ def seeded_carrot_agent(obs):
     return {"farmer": farmer, "hands": [], "market": market}
 
 
+def stockpiled_fertilizer_agent(obs):
+    market = [["BUY_PRODUCT", "FERTILIZER", 2]] if int(obs.get("step", 0)) == 0 else []
+    return {"farmer": ["PASS"], "hands": [], "market": market}
+
+
 def test_paired_tournament_reuses_each_seed_in_both_seats(tmp_path):
     report = run_paired_tournament(
         pass_agent,
@@ -57,6 +62,16 @@ def test_terminal_diagnostics_include_seed_cost_and_standing_yield():
     assert diagnostics["terminal_field_yield_by_product"] == {"CARROT": 3}
     assert diagnostics["terminal_field_yield_units"] == 3
     assert diagnostics["terminal_field_yield_market_value"] > 0
+
+
+def test_terminal_diagnostics_value_fertilizer_inventory():
+    result = run_game(stockpiled_fertilizer_agent, pass_agent, 456, episode_steps=24)
+    diagnostics = result["diagnostics"][0]
+
+    assert diagnostics["terminal_unsold_by_product"] == {"FERTILIZER": 2}
+    assert diagnostics["terminal_unsold_items"] == 2
+    assert diagnostics["terminal_unsold_market_value"] == 200
+    assert diagnostics["terminal_non_cash_value"] == 200
 
 
 def test_frozen_opponents_are_observation_deterministic():
@@ -114,4 +129,5 @@ def test_animal_specialist_exercises_the_full_livestock_loop():
         ("BUY_ANIMAL", "COW"),
         ("BUY_ANIMAL", "SHEEP"),
         ("BUY_LAND", None),
+        ("SELL", "FERTILIZER"),
     } <= market_ops
