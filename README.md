@@ -9,23 +9,25 @@ The current policy combines:
 - cash-runway-aware daily hiring and staged land expansion;
 - seed accounting that avoids the simulator's all-or-nothing simultaneous-plant failure;
 - automatic liquidation and a defensive no-error fallback.
+- adaptive livestock expansion: eight sheep by default, or a latched
+  four-sheep/four-cow response to an early sheep-heavy opponent.
 
 ## Current result
 
 The first promoted candidate completed every local validation episode. In the 25-seed, slot-swapped pre-submission gate against the built-in `starter`, it won **25/25** with mean final bank **40,499** versus **3,497**, zero preventable crop losses, zero cash-collapse days, and zero terminal unsold items. It also won 25/25 against `random`. This is plumbing evidence, not a leaderboard-performance claim: strong evaluation requires a larger frozen opponent pool.
 
-Kaggle submission `55245711` passed its server self-play validation (`COMPLETE`) with no stdout/stderr errors. It won its first public episode, then lost the next two; the live rating moved from the default 600 to 676.3 and then 511.8. The losses exposed the intended gap between a plumbing baseline and a competitive policy: v1 uses crops and hired hands but no livestock or fertilizer, and it strands purchased seeds at the terminal boundary.
+Kaggle submission `55245711` passed its server self-play validation (`COMPLETE`) with no stdout/stderr errors. It won its first public episode, then lost the next two; its moving rating fell as low as 511.8 and later reached 636.3 as additional matches completed. The losses exposed the intended gap between a plumbing baseline and a competitive policy: v1 uses crops and hired hands but no livestock or fertilizer, and it strands purchased seeds at the terminal boundary.
 
 The exact submitted v1 is preserved by Git commit `dd3bbec` and tag `submission-55245711`. Development candidates are not promoted to `main.py` or submitted to Kaggle until they pass deterministic paired-seat gates against the frozen local opponent pool.
 
-Current development status: early mixed-livestock and crop/seed-cap prototypes failed and were rejected. The four-sheep V4 candidate subsequently passed a 250-episode local pool gate with 241 wins, including 43/50 against submitted v1 and 48/50 against V3, while all safety diagnostics remained zero. V4 is still withheld from Kaggle pending an independent readiness audit and a stronger adversarial opponent; see `reports/v4-promotion-gate.md`.
+Current development status: early mixed-livestock and crop/seed-cap prototypes failed and were rejected. V6 then passed a strict 50-episode paired-seat gate against the stronger V5 policy with 50 wins, a +9,880 mean margin, and zero safety failures. It also won both seats against open-loop traces of each public v1 loss. An independent GPT-5.6 Sol extra-high audit approved exactly one monitored progress submission; see `reports/v6-release-gate.md`.
 
 ## Repository map
 
 | Path | Purpose |
 |---|---|
 | `main.py` | Single-file Kaggle submission |
-| `agents/` | Immutable baselines and unpromoted development candidates |
+| `agents/` | Immutable submitted baselines and development candidates |
 | `scripts/tournament.py` | Seeded, slot-swapped local evaluation harness |
 | `tests/` | Full-episode validity and self-play tests |
 | `docs/competition.md` | Competition mechanics, evaluation, timeline, and submission contract |

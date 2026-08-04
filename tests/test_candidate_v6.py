@@ -74,7 +74,7 @@ def test_candidate_v6_exact_portfolios_and_clean_lifecycle_in_both_seats() -> No
         ROOT / "agents" / "candidate_v6_adaptive_livestock.py",
         "candidate_v6_lifecycle_test",
     )
-    v1 = _load(ROOT / "main.py", "candidate_v1_v6_test")
+    v1 = _load(ROOT / "agents" / "submission_v1.py", "candidate_v1_v6_test")
     v5 = _load(ROOT / "agents" / "candidate_v5_eight_sheep.py", "candidate_v5_v6_test")
     regimes = ((v1.agent, (8, 0)), (v5.agent, (4, 4)))
     candidate.FALLBACK_COUNT = 0
