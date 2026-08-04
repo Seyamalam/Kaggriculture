@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from scripts.frozen_opponents import crop_specialist, diversified_baseline
+from scripts.frozen_opponents import animal_specialist, crop_specialist, diversified_baseline
 from scripts.tournament import run_game, run_paired_tournament
 
 
@@ -67,8 +67,51 @@ def test_frozen_opponents_are_observation_deterministic():
     env = make("kaggriculture", configuration={"episodeSteps": 24, "seed": 9}, debug=True)
     env.run([pass_agent, pass_agent])
     observation = env.steps[0][0].observation
-    for policy in (crop_specialist, diversified_baseline):
+    for policy in (crop_specialist, diversified_baseline, animal_specialist):
         first = policy(observation)
         second = policy(observation)
         assert first == second
         assert len(first["hands"]) == len(observation.farms[0].hands)
+
+
+def test_animal_specialist_exercises_the_full_livestock_loop():
+    from kaggle_environments import make
+
+    unit_ops: set[str] = set()
+    market_ops: set[tuple[str, str | None]] = set()
+
+    def recording_agent(obs):
+        action = animal_specialist(obs)
+        unit_ops.update(
+            operation[0]
+            for operation in [action["farmer"], *action["hands"]]
+            if operation
+        )
+        market_ops.update(
+            (order[0], str(order[1]) if len(order) > 1 else None)
+            for order in action["market"]
+            if order
+        )
+        return action
+
+    env = make("kaggriculture", configuration={"episodeSteps": 720, "seed": 31415}, debug=True)
+    env.run([recording_agent, diversified_baseline])
+
+    assert [state.status for state in env.steps[-1]] == ["DONE", "DONE"]
+    assert float(env.steps[-1][0].reward) > float(env.steps[-1][1].reward)
+    assert {
+        "BUILD_COOP",
+        "BUILD_PASTURE",
+        "PLACE",
+        "FEED",
+        "CARE",
+        "HARVEST",
+        "COLLECT_FERTILIZER",
+        "FERTILIZE",
+    } <= unit_ops
+    assert {
+        ("BUY_ANIMAL", "GOOSE"),
+        ("BUY_ANIMAL", "COW"),
+        ("BUY_ANIMAL", "SHEEP"),
+        ("BUY_LAND", None),
+    } <= market_ops
