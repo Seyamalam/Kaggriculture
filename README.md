@@ -31,7 +31,9 @@ second agent independently rejected the newer public Hamburger V27 anchor: it
 lost 11 of 12 fresh head-to-head games against V7, and its source has no
 explicit redistribution license. Kaggle validation completed on engine 1.32.4
 with both seats DONE, banks 111,277 and 110,880, and zero logged errors. See
-`reports/v7-public-meta-gate.md` and `reports/submission-55248314.md`.
+`reports/v7-public-meta-gate.md`, `reports/submission-55248314.md`, and
+`reports/v7-live-55-match-audit.md` for the first 55 public matches and the
+market-price-capture diagnosis.
 
 ## Repository map
 
