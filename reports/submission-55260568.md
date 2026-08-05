@@ -15,9 +15,19 @@ state. Final rewards were 107,531 and 107,144. Both agent log streams had
 empty stdout and stderr on every turn.
 
 The score shown immediately after validation was 600.0. At that time the
-submission had no public matchmaking episodes; 600 is therefore the initial
-rating, not a measured public win/loss result. The submission must remain under
-observation until scheduled public matches appear.
+submission had no public matchmaking episodes; 600 was therefore the initial
+rating, not a measured public win/loss result.
+
+## Public matches
+
+| Episode | Opponent | Result | Reward | Opponent reward | Margin | Rating after match |
+|---:|---|---|---:|---:|---:|---:|
+| 90108945 | RacoonTW | win | 183,352 | 34,264 | +149,088 | 696.0 |
+
+The first public episode completed with both agents in `DONE` state and no
+non-empty stdout or stderr entries from V18. One match is not enough to compare
+its 696 rating with established submissions; scheduled public games must keep
+accumulating.
 
 The downloaded replay and logs are retained in the ignored `replays/` and
 `logs/` directories for local analysis.
