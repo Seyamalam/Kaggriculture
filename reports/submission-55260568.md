@@ -23,11 +23,14 @@ rating, not a measured public win/loss result.
 | Episode | Opponent | Result | Reward | Opponent reward | Margin | Rating after match |
 |---:|---|---|---:|---:|---:|---:|
 | 90108945 | RacoonTW | win | 183,352 | 34,264 | +149,088 | 696.0 |
+| 90109603 | huanxian chen | win | 165,809 | 52,827 | +112,982 | — |
+| 90110271 | typeIIIfairy | win | 103,151 | 81,025 | +22,126 | — |
+| 90110946 | Manish Kumar | win | 133,704 | 67,798 | +65,906 | 1,014.9 |
 
-The first public episode completed with both agents in `DONE` state and no
-non-empty stdout or stderr entries from V18. One match is not enough to compare
-its 696 rating with established submissions; scheduled public games must keep
-accumulating.
+The first four public episodes were wins with both agents in `DONE` state and
+no non-empty stdout or stderr entries from V18. Four matches are still too few
+for a stable comparison with established submissions, but the rating has moved
+from its 600 start to 1,014.9.
 
 The downloaded replay and logs are retained in the ignored `replays/` and
 `logs/` directories for local analysis.
