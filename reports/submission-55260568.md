@@ -37,12 +37,24 @@ rating, not a measured public win/loss result.
 | 90116405 | Amy Yuan | win | 133,583 | 129,654 | +3,929 | — |
 | 90117048 | takai380 | win | 126,046 | 113,693 | +12,353 | — |
 | 90117722 | Mobzya | win | 161,038 | 160,931 | +107 | 1,804.1 |
+| 90118413 | 木下陽平 | win | 130,380 | 128,339 | +2,041 | — |
+| 90119117 | cmxu | win | 120,643 | 110,893 | +9,750 | — |
+| 90119795 | GzmCR632 | win | 116,522 | 115,588 | +934 | — |
+| 90120485 | KevlarZanderChi | win | 138,368 | 137,285 | +1,083 | — |
+| 90121168 | Roshan Singh | win | 141,217 | 139,272 | +1,945 | — |
+| 90121857 | CROW | win | 148,645 | 147,619 | +1,026 | — |
+| 90122540 | fmind | win | 144,393 | 141,446 | +2,947 | — |
+| 90123236 | sash | loss | 112,562 | 124,362 | -11,800 | — |
+| 90123284 | Nkosi Ndwandwe | win | 133,469 | 131,365 | +2,104 | — |
+| 90123938 | yjhv buddies | loss | 131,814 | 136,652 | -4,838 | — |
+| 90124623 | Sai Teja Bandaru | win | 136,232 | 135,049 | +1,183 | — |
+| 90125302 | wacata | win | 138,997 | 136,775 | +2,222 | 2,053.6 |
 
-The first 15 public episodes finished 14-1 with both agents in `DONE` state and
-no non-empty stdout or stderr entries from V18. Fifteen matches are still too
-few for a stable comparison with established submissions, but the rating has
-moved from its 600 start to 1,804.1. The first loss was only 595 coins and is
-retained as a fresh diagnostic rather than tuned immediately.
+The first 27 public episodes finished 24-3 with every episode in `DONE/DONE`
+state. V18 rose from its 600 start to 2,053.6. Its losses were Will Rice by 595,
+sash by 11,800, and yjhv buddies by 4,838. See
+`reports/v18-public-loss-analysis.md` for the checkpoint, production, and
+executed-market attribution.
 
 The downloaded replay and logs are retained in the ignored `replays/` and
 `logs/` directories for local analysis.

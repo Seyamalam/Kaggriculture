@@ -20,8 +20,8 @@ then adds a one-time late capital latch. It combines:
 
 ## Current result
 
-Submitted V18 opened 14-1 in public play and rose from its 600 initial rating
-to 1,804.1. V21 then improved the frozen historical corpus from V18's 94/110
+Submitted V18 opened 24-3 in public play and rose from its 600 initial rating
+to 2,053.6. V21 then improved the frozen historical corpus from V18's 94/110
 wins to 100/110 and an untouched live-15 corpus from 27/30 to 29/30, with zero
 V18 win-to-V21 loss flips or worsened V18 non-wins. It preserved the sealed
 top-20 result at 31/40 wins. Across 100 adaptive paired seeds against exact
