@@ -41,6 +41,7 @@ with both seats DONE, banks 111,277 and 110,880, and zero logged errors. See
 | `agents/` | Immutable submitted baselines and development candidates |
 | `THIRD_PARTY_NOTICES.md` | Attribution and per-file licenses for imported public policies |
 | `scripts/tournament.py` | Seeded, slot-swapped local evaluation harness |
+| `scripts/leaderboard_benchmark.py` | Live top-ladder public replay-trace benchmark |
 | `tests/` | Full-episode validity and self-play tests |
 | `docs/competition.md` | Competition mechanics, evaluation, timeline, and submission contract |
 | `docs/rules.md` | Implementation-focused rules summary |
@@ -79,6 +80,38 @@ Actions or another hosted CI/CD workflow. Install it once after cloning; every
 commit will then run the full test suite. Every tournament comparison swaps
 player slots. Increase the game count and use a frozen scripted-opponent pool
 before promoting a strategic change.
+
+## Benchmark the current leaders
+
+With Kaggle credentials configured, one command resolves the current top five
+teams, selects each team's best active submission and newest completed public
+episode, downloads the public replay into the ignored `artifacts/` cache, and
+tests `main.py` against each recorded policy from both seats:
+
+```bash
+uv run python scripts/leaderboard_benchmark.py \
+  --candidate main.py \
+  --top 5 \
+  --episodes-per-team 1
+```
+
+The command writes `artifacts/leaderboard-benchmark.json` and `.md`. Increase
+`--top` or `--episodes-per-team` for a broader, slower screen. To compare a new
+candidate against the exact same teams and episode seeds without refreshing the
+API, reuse the saved snapshot and choose different output paths:
+
+```bash
+uv run python scripts/leaderboard_benchmark.py \
+  --candidate agents/candidate_v8_market_order.py \
+  --snapshot artifacts/leaderboard-benchmark.json \
+  --output artifacts/v8-leaderboard-benchmark.json \
+  --markdown artifacts/v8-leaderboard-benchmark.md
+```
+
+This is an open-loop stress benchmark: recorded public actions do not adapt
+after our candidate changes the simulated state. It is useful for regression
+and adversarial screening, but it does not execute competitors' private source
+code and does not estimate live ladder win probability.
 
 ## Submit
 
