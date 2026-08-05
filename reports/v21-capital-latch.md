@@ -73,3 +73,7 @@ Both independent final audits approved one monitored submission. The isolated
 smoke completed both seats in `DONE` state with candidate rewards 190,266 and
 196,731 against `starter`. `main.py` was promoted by exact mechanical copy and
 verified byte-identical to the audited candidate hash above.
+
+The exact file was committed as `23d9fee` and uploaded as Kaggle submission
+`55263274`. Server validation episode `90124697` completed both seats in `DONE`
+state with empty stdout/stderr and rewards 107,531/107,144.
