@@ -81,14 +81,23 @@ near-identical supply schedules.
 ## Live top-five benchmark snapshot
 
 The new one-command benchmark selected the best active submission and newest
-completed public trace for each of the current top five teams. Exact V7 won 3
-of 10 both-seat simulations, with median margin -2,739. It split 1-1 against
-the 3,092-rated leader trace and lost both seats to three other high-rated
-traces. One trace collapsed open-loop and created a large positive outlier, so
-the +30,872 mean margin is not a useful headline; median and per-team results
-control the decision.
+completed public trace for each of the current top five teams. On the same
+1.32.4 engine used by the server, exact V7 won 1 of 10 both-seat simulations,
+with mean margin -2,469 and median margin -2,738. It split 1-1 against the
+3,092-rated leader trace and lost both seats to each of the other four traces.
 
 V8 produced exactly the same top-five results and remains unpromoted.
+
+## Rejected V9 expert switches
+
+A follow-up agent reran complete-market and milk-first ablations on engine
+1.32.4. Forcing Manual, Dmitry, or Lucien market schedules while retaining the
+Mohit physical board lost 9,475--9,862 coins per fresh paired mirror. On a
+representative nine-trace live panel, their mean margins were no better than
+the Mohit control: Mohit -2,120; Manual -3,616; Dmitry -2,673; Lucien -2,189.
+A day-12+ same-footprint milk-first rule scored -2,126 and also failed to
+improve the control. V9 was rejected without creating a candidate or changing
+`main.py`.
 
 ## Next gates
 

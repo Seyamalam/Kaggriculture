@@ -136,8 +136,8 @@ uvx kaggle competitions logs EPISODE_ID AGENT_INDEX
 ## Reproducibility
 
 - Python: 3.12
-- `kaggle-environments`: 1.32.3
-- Environment source SHA-256: `2f5f94e3da0f007f6d7628e30889bd19c83716183eeaa05b4922430db5021737`
+- `kaggle-environments`: 1.32.4
+- Environment source SHA-256: `9741c0470a8db98a70644491d5121ae6295413343d1a08ef9fcee35e0b76f2c5`
 - Current promoted agent SHA-256: `603175d39f2857cbd618dc8f5ac9411e9fd234e3142777ec203342172f05a50e`
 - Default local seed sequence starts at `20260804`
 - The agent is deterministic for a given observation; environmental weeds and town shops remain stochastic.
