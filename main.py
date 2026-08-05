@@ -4635,3 +4635,240 @@ def agent(obs):
 def _kaggle_submission_entrypoint(obs):
     """Keep the final callable selected by Kaggle bound to the public agent."""
     return agent(obs)
+
+
+_V18S_BASE_AGENT = agent
+_V18S_FIRST_ACTIVE_STEP = 289
+_V18S_TERMINAL_STEP = 718
+_V18S_PREMIUM = ("MILK", "STRAWBERRY", "WOOL", "MELON")
+_V18S_DEFAULT_PARAMS = {
+    "STRAWBERRY": {
+        "base": 120, "I0": 10_000, "T": 100,
+        "below_func": "sqrt", "below_target": 0.70,
+        "above_func": "linear", "above_target": 1.60,
+    },
+    "MELON": {
+        "base": 250, "I0": 10_000, "T": 300,
+        "below_func": "log", "below_target": 0.20,
+        "above_func": "sq", "above_target": 3.60,
+    },
+    "MILK": {
+        "base": 160, "I0": 10_000, "T": 122,
+        "below_func": "sqrt", "below_target": 0.60,
+        "above_func": "linear", "above_target": 1.60,
+    },
+    "WOOL": {
+        "base": 200, "I0": 10_000, "T": 105,
+        "below_func": "log", "below_target": 0.20,
+        "above_func": "sq", "above_target": 3.20,
+    },
+}
+_V18S_SHOP_PRODUCTS = {
+    "PIZZA_SHOP": {"MILK"},
+    "BRUNCH_SPOT": {"STRAWBERRY"},
+    "YARN_STORE": {"WOOL"},
+    "ICE_CREAM_SHOP": {"MILK", "STRAWBERRY"},
+    "SMOOTHIE_SHOP": {"MILK", "STRAWBERRY"},
+    "FARMERS_MARKET": {"STRAWBERRY"},
+}
+
+
+def _v18s_number(value, default=0):
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _v18s_shape(name, value):
+    value = max(0.0, float(value))
+    if name == "linear":
+        return value
+    if name == "sq":
+        return value * value
+    if name == "sqrt":
+        return math.sqrt(value)
+    if name == "log":
+        return math.log1p(value)
+    if name == "log10":
+        return math.log10(1.0 + value)
+    return value
+
+
+def _v18s_market_price(item, inventory, market):
+    params = dict(_V18S_DEFAULT_PARAMS[item])
+    overrides = _get(market, "params", {}) or {}
+    patch = _get(overrides, item, {}) or {}
+    if isinstance(patch, dict):
+        params.update(patch)
+    base = float(params["base"])
+    center = int(params["I0"])
+    target_units = float(params["T"])
+    if inventory < center:
+        shape = params["below_func"]
+        amplitude = (
+            float(params["below_target"]) * base
+            / _v18s_shape(shape, target_units)
+        )
+        price = base + amplitude * _v18s_shape(shape, center - inventory)
+    else:
+        shape = params["above_func"]
+        amplitude = (
+            float(params["above_target"]) * base
+            / _v18s_shape(shape, target_units)
+        )
+        price = base - amplitude * _v18s_shape(shape, inventory - center)
+    return max(1, int(round(price)))
+
+
+def _v18s_project_shed(obs, action):
+    """Mirror legal same-turn DROP, PLACE, and PICKUP before market play."""
+    player = _v18s_number(_get(obs, "player", 0))
+    farms = list(_get(obs, "farms", []) or [])
+    farm = farms[player] if 0 <= player < len(farms) else {}
+    private = _get(obs, "private", {}) or {}
+    projected = dict(_get(private, "shed", {}) or {})
+    inventories = list(_get(private, "inventories", []) or [])
+    positions = [_get(farm, "farmer", None), *list(_get(farm, "hands", []) or [])]
+    actor_actions = [action.get("farmer", ["PASS"]), *list(action.get("hands") or [])]
+    tiles = list(_get(farm, "tiles", []) or [])
+    board_size = len(tiles) or 10
+    half = board_size // 2
+    shed_access = {
+        (half - 1, half - 1), (half, half - 1),
+        (half - 1, half), (half, half),
+    }
+
+    for actor_index, actor_action in enumerate(actor_actions):
+        if actor_index >= len(positions) or actor_index >= len(inventories):
+            continue
+        position = positions[actor_index]
+        if not isinstance(position, (list, tuple)) or len(position) < 2:
+            continue
+        x, y = _v18s_number(position[0]), _v18s_number(position[1])
+        if (x, y) not in shed_access:
+            continue
+        if not (0 <= y < len(tiles) and 0 <= x < len(tiles[y])):
+            continue
+        tile = tiles[y][x]
+        if tile == "LOCKED" or not isinstance(actor_action, list) or not actor_action:
+            continue
+        inventory = dict(inventories[actor_index] or {})
+        operation = actor_action[0]
+
+        if operation == "DROP":
+            for item, raw_quantity in inventory.items():
+                quantity = max(0, _v18s_number(raw_quantity))
+                room = max(0, 100 - sum(projected.values()))
+                deposited = min(quantity, room)
+                if deposited > 0:
+                    projected[item] = projected.get(item, 0) + deposited
+            continue
+
+        if operation == "PICKUP" and len(actor_action) >= 2:
+            item = actor_action[1]
+            requested = _v18s_number(actor_action[2], 1) if len(actor_action) >= 3 else 1
+            removed = min(max(0, requested), max(0, _v18s_number(projected.get(item, 0))))
+            if removed > 0:
+                projected[item] = _v18s_number(projected.get(item, 0)) - removed
+            continue
+
+        if operation != "PLACE" or len(actor_action) < 2:
+            continue
+        item = actor_action[1]
+        structure = _C17_ANIMAL_STRUCTURES.get(item)
+        if (
+            structure is not None
+            and isinstance(tile, dict)
+            and tile.get("kind") == structure
+            and "animal" not in tile
+        ):
+            continue
+        requested = _v18s_number(actor_action[2], 1) if len(actor_action) >= 3 else 1
+        quantity = min(max(0, requested), max(0, _v18s_number(inventory.get(item, 0))))
+        room = max(0, 100 - sum(projected.values()))
+        deposited = min(quantity, room)
+        if deposited > 0:
+            projected[item] = projected.get(item, 0) + deposited
+    return projected
+
+
+def _v18s_refreshed_products(obs, step):
+    if step % 4 != 1:
+        return set()
+    refreshed = set(_V18S_PREMIUM) if step % 12 == 1 else set()
+    town = _get(obs, "town", {}) or {}
+    for shop in _get(town, "unlocked_shops", []) or []:
+        refreshed.update(_V18S_SHOP_PRODUCTS.get(shop, ()))
+    return refreshed
+
+
+def _v18s_safe_addition(item, stock, covered, inventory, market):
+    """Cap for one matching rival unit in each per-unit lockstep round."""
+    base = min(stock, covered)
+    safe_total = 0
+    for quantity in range(1, stock + 1):
+        quote_inventory = inventory + 2 * (quantity - 1)
+        if _v18s_market_price(item, quote_inventory, market) <= 1:
+            break
+        safe_total = quantity
+    return min(stock - base, max(0, safe_total - base))
+
+
+def _v18s_recovery_sweep(obs, action):
+    copied = _copy_action(action)
+    step = _v18s_number(_get(obs, "step", 0))
+    refreshed = _v18s_refreshed_products(obs, step)
+    if not (
+        _V18S_FIRST_ACTIVE_STEP <= step < _V18S_TERMINAL_STEP
+        and refreshed
+    ):
+        return copied
+    market_orders = list(copied.get("market") or [])
+    free_slots = max(0, MAX_ORDERS - len(market_orders))
+    if free_slots == 0:
+        return copied
+
+    projected = _v18s_project_shed(obs, copied)
+    covered = {}
+    for order in market_orders:
+        if isinstance(order, list) and len(order) >= 3 and order[0] == "SELL":
+            covered[order[1]] = covered.get(order[1], 0) + max(
+                0, _v18s_number(order[2])
+            )
+
+    public_market = _get(obs, "market", {}) or {}
+    inventory = _get(public_market, "inventory", {}) or {}
+    additions = []
+    for item in _V18S_PREMIUM:
+        if item not in refreshed:
+            continue
+        stock = max(0, _v18s_number(projected.get(item, 0)))
+        start = _v18s_number(inventory.get(item, 10_000), 10_000)
+        quantity = _v18s_safe_addition(
+            item, stock, covered.get(item, 0), start, public_market
+        )
+        if quantity <= 0:
+            continue
+        marginal_value = sum(
+            _v18s_market_price(item, start + unit, public_market)
+            for unit in range(quantity)
+        )
+        additions.append((marginal_value, ["SELL", item, quantity]))
+
+    additions.sort(key=lambda pair: pair[0], reverse=True)
+    copied["market"] = [order for _, order in additions[:free_slots]] + market_orders
+    return copied
+
+
+def agent(obs):
+    """V18: exact V7 plus a capped, demand-matched recovery sweep."""
+    raw = _V18S_BASE_AGENT(obs)
+    try:
+        return _v18s_recovery_sweep(obs, raw)
+    except Exception:
+        return _copy_action(raw)
+
+
+def _v18s_submission_entrypoint(obs):
+    return agent(obs)

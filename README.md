@@ -2,8 +2,9 @@
 
 A reproducible, self-contained agent for Kaggle's [Kaggriculture competition](https://www.kaggle.com/competitions/kaggriculture/overview). Kaggriculture is a two-player farming simulation, not a supervised train/test prediction task. The deliverable is a `main.py` policy that earns more banked coins than its opponent after 720 turns.
 
-The current V7 policy is the exact, attributed Apache-2.0 public V18/C20
-closed-loop policy. It combines:
+The current V18 policy retains the exact, attributed Apache-2.0 public V18/C20
+closed-loop farm route and adds a locally developed, engine-derived market
+recovery overlay. It combines:
 
 - deterministic task assignment for planting, watering, harvesting, weeds, and shed logistics;
 - opponent- and inventory-aware crop scoring using the published market curves;
@@ -12,28 +13,21 @@ closed-loop policy. It combines:
 - automatic liquidation and a defensive no-error fallback.
 - a three-quadrant, 12-hand production route with eight cows and six sheep;
 - public-state expert selection for route repair and market-order timing.
+- demand-matched premium sales on the first turn after town consumption;
+- a matched-rival price-floor cap that keeps denial sales economically useful.
 
 ## Current result
 
-The first promoted candidate completed every local validation episode. In the 25-seed, slot-swapped pre-submission gate against the built-in `starter`, it won **25/25** with mean final bank **40,499** versus **3,497**, zero preventable crop losses, zero cash-collapse days, and zero terminal unsold items. It also won 25/25 against `random`. This is plumbing evidence, not a leaderboard-performance claim: strong evaluation requires a larger frozen opponent pool.
-
-Kaggle submission `55245711` passed its server self-play validation (`COMPLETE`) with no stdout/stderr errors. It won its first public episode, then lost the next two; its moving rating fell as low as 511.8 and later reached 636.3 as additional matches completed. The losses exposed the intended gap between a plumbing baseline and a competitive policy: v1 uses crops and hired hands but no livestock or fertilizer, and it strands purchased seeds at the terminal boundary.
-
-The exact submitted v1 is preserved by Git commit `dd3bbec` and tag `submission-55245711`. Development candidates are not promoted to `main.py` or submitted to Kaggle until they pass deterministic paired-seat gates against the frozen local opponent pool.
-
-Current development status: V7 is promoted and live as Kaggle submission
-`55248314`. It beat submitted V6 in all 10 initial paired-seat episodes by
-118,341 coins on average, then won all 200 episodes in the extended frozen-pool
-screen. Ten mirror pairs averaged 130,031 coins without seat collapse. An
-independent GPT-5.6 Sol extra-high audit reproduced the integrity, runtime,
-reset, legality, and mirror checks and approved one monitored submission. A
-second agent independently rejected the newer public Hamburger V27 anchor: it
-lost 11 of 12 fresh head-to-head games against V7, and its source has no
-explicit redistribution license. Kaggle validation completed on engine 1.32.4
-with both seats DONE, banks 111,277 and 110,880, and zero logged errors. See
-`reports/v7-public-meta-gate.md`, `reports/submission-55248314.md`, and
-`reports/v7-live-55-match-audit.md` for the first 55 public matches and the
-market-price-capture diagnosis.
+V18 won 177 of 200 fresh paired mirrors against submitted V7, with every
+50-pair block and both seats positive and +2,738 mean paired margin. Against a
+frozen top-10 corpus it changed V7's 2-58 record and -3,926 mean margin to
+50-10 and +1,254. A one-shot live top-20 holdout finished 31-9 at +1,155; the
+untuned ranks 11-20 subset was 16-4 at +950. The historical 55-replay corpus
+improved from 78 to 94 wins across 110 both-seat comparisons while retaining
+16/18 wins against the weak four-cow cluster. See
+`reports/v18-recovery-sweep.md` for the causal controls, audits, limitations,
+and exact release evidence. Earlier submitted V7 remains preserved as Kaggle
+submission `55248314` and by repository history.
 
 ## Repository map
 
@@ -173,7 +167,7 @@ reproducible regression screen rather than a live win-rate estimate.
 ```bash
 uvx kaggle competitions submit kaggriculture \
   -f main.py \
-  -m "public-meta v7 603175d3"
+  -m "v18 demand recovery 30683478"
 ```
 
 After submission, validate the status, then inspect server episodes and logs before treating the result as usable:
@@ -189,7 +183,7 @@ uvx kaggle competitions logs EPISODE_ID AGENT_INDEX
 - Python: 3.12
 - `kaggle-environments`: 1.32.4
 - Environment source SHA-256: `9741c0470a8db98a70644491d5121ae6295413343d1a08ef9fcee35e0b76f2c5`
-- Current promoted agent SHA-256: `603175d39f2857cbd618dc8f5ac9411e9fd234e3142777ec203342172f05a50e`
+- Current promoted agent SHA-256: `3068347896710078b93f705cd2f46986033d7132fa426e68bd8cfb93756fb436`
 - Default local seed sequence starts at `20260804`
 - The agent is deterministic for a given observation; environmental weeds and town shops remain stochastic.
 
