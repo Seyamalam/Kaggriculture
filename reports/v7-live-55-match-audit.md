@@ -99,6 +99,23 @@ A day-12+ same-footprint milk-first rule scored -2,126 and also failed to
 improve the control. V9 was rejected without creating a candidate or changing
 `main.py`.
 
+## Rejected V10 causal pairwise ranker
+
+V10 used three compact regularized logistic scorers trained on exact-engine
+counterfactual ordering labels from ten chronological, disjoint live-loss
+traces. Nine later live losses were held out, and the entire top-five snapshot
+remained sealed. Only observable public state and V7's existing sale quantities
+were used; raw opponent actions, identities, future outcomes, physical actions,
+and protected market orders were excluded.
+
+The first gates were encouraging: four fresh paired mirrors were 4-0 with a
++3,885 mean paired margin, and the nine-loss holdout improved by +244 on average
+with 14/18 positive deltas and no regressions. The sealed top-five gate rejected
+it: only 4/10 simulations improved, six were unchanged, mean gain was +12, and
+the 1-9 record did not change. Strawberry/wool ordering transferred poorly
+(38.9% held-out pair accuracy). V10 was deleted before broad testing and made no
+repository or submission change.
+
 ## Next gates
 
 The physical route remains frozen. The next candidate must target market price
