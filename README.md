@@ -2,9 +2,9 @@
 
 A reproducible, self-contained agent for Kaggle's [Kaggriculture competition](https://www.kaggle.com/competitions/kaggriculture/overview). Kaggriculture is a two-player farming simulation, not a supervised train/test prediction task. The deliverable is a `main.py` policy that earns more banked coins than its opponent after 720 turns.
 
-The current V18 policy retains the exact, attributed Apache-2.0 public V18/C20
-closed-loop farm route and adds a locally developed, engine-derived market
-recovery overlay. It combines:
+The current V21 policy retains the exact, attributed Apache-2.0 public V18/C20
+closed-loop farm route and the locally developed V18 market-recovery overlay,
+then adds a one-time late capital latch. It combines:
 
 - deterministic task assignment for planting, watering, harvesting, weeds, and shed logistics;
 - opponent- and inventory-aware crop scoring using the published market curves;
@@ -15,19 +15,21 @@ recovery overlay. It combines:
 - public-state expert selection for route repair and market-order timing.
 - demand-matched premium sales on the first turn after town consumption;
 - a matched-rival price-floor cap that keeps denial sales economically useful.
+- late abstention from added sweeps only when the public rival is already at
+  least 5,000 coins behind at step 577.
 
 ## Current result
 
-V18 won 177 of 200 fresh paired mirrors against submitted V7, with every
-50-pair block and both seats positive and +2,738 mean paired margin. Against a
-frozen top-10 corpus it changed V7's 2-58 record and -3,926 mean margin to
-50-10 and +1,254. A one-shot live top-20 holdout finished 31-9 at +1,155; the
-untuned ranks 11-20 subset was 16-4 at +950. The historical 55-replay corpus
-improved from 78 to 94 wins across 110 both-seat comparisons while retaining
-16/18 wins against the weak four-cow cluster. See
-`reports/v18-recovery-sweep.md` for the causal controls, audits, limitations,
-and exact release evidence. Earlier submitted V7 remains preserved as Kaggle
-submission `55248314` and by repository history.
+Submitted V18 opened 14-1 in public play and rose from its 600 initial rating
+to 1,804.1. V21 then improved the frozen historical corpus from V18's 94/110
+wins to 100/110 and an untouched live-15 corpus from 27/30 to 29/30, with zero
+V18 win-to-V21 loss flips or worsened V18 non-wins. It preserved the sealed
+top-20 result at 31/40 wins. Across 100 adaptive paired seeds against exact
+V18, V21 was 2-1 with 97 ties, +6.98 mean paired margin, all four chronological
+blocks nonnegative, and zero invalid/cash/weed regressions. See
+`reports/v18-recovery-sweep.md`, `reports/submission-55260568.md`, and
+`reports/v21-capital-latch.md` for the causal controls, live results, audits,
+and exact release evidence.
 
 ## Repository map
 
@@ -198,7 +200,7 @@ long-running audit. Narrow `--pattern` for a manifest-verified smoke subset.
 ```bash
 uvx kaggle competitions submit kaggriculture \
   -f main.py \
-  -m "v18 demand recovery 30683478"
+  -m "v21 capital latch 0cd14b65"
 ```
 
 After submission, validate the status, then inspect server episodes and logs before treating the result as usable:
@@ -214,7 +216,7 @@ uvx kaggle competitions logs EPISODE_ID AGENT_INDEX
 - Python: 3.12
 - `kaggle-environments`: 1.32.4
 - Environment source SHA-256: `9741c0470a8db98a70644491d5121ae6295413343d1a08ef9fcee35e0b76f2c5`
-- Current promoted agent SHA-256: `3068347896710078b93f705cd2f46986033d7132fa426e68bd8cfb93756fb436`
+- Current promoted agent SHA-256: `0cd14b653102d276c4f902fa3b8c6bd81d869b8ab64c422cb881b9d2346ec639`
 - Default local seed sequence starts at `20260804`
 - The agent is deterministic for a given observation; environmental weeds and town shops remain stochastic.
 

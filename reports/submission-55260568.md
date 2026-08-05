@@ -33,11 +33,15 @@ rating, not a measured public win/loss result.
 | 90114321 | Sheep | win | 135,201 | 131,373 | +3,828 | — |
 | 90115006 | Milkomeda | win | 138,644 | 124,790 | +13,854 | — |
 | 90115677 | Will Rice | loss | 138,524 | 139,119 | -595 | 1,544.3 |
+| 90116362 | Bocen Li | win | 181,866 | 54,228 | +127,638 | — |
+| 90116405 | Amy Yuan | win | 133,583 | 129,654 | +3,929 | — |
+| 90117048 | takai380 | win | 126,046 | 113,693 | +12,353 | — |
+| 90117722 | Mobzya | win | 161,038 | 160,931 | +107 | 1,804.1 |
 
-The first 11 public episodes finished 10-1 with both agents in `DONE` state and
-no non-empty stdout or stderr entries from V18. Eleven matches are still too
+The first 15 public episodes finished 14-1 with both agents in `DONE` state and
+no non-empty stdout or stderr entries from V18. Fifteen matches are still too
 few for a stable comparison with established submissions, but the rating has
-moved from its 600 start to 1,544.3. The first loss was only 595 coins and is
+moved from its 600 start to 1,804.1. The first loss was only 595 coins and is
 retained as a fresh diagnostic rather than tuned immediately.
 
 The downloaded replay and logs are retained in the ignored `replays/` and
