@@ -30,11 +30,15 @@ rating, not a measured public win/loss result.
 | 90112297 | Enrico Ambrosio | win | 129,474 | 106,888 | +22,586 | 1,198.4 |
 | 90112969 | Furina | win | 142,055 | 131,921 | +10,134 | 1,282.3 |
 | 90113641 | Ayodeji | win | 153,147 | 140,240 | +12,907 | 1,393.2 |
+| 90114321 | Sheep | win | 135,201 | 131,373 | +3,828 | — |
+| 90115006 | Milkomeda | win | 138,644 | 124,790 | +13,854 | — |
+| 90115677 | Will Rice | loss | 138,524 | 139,119 | -595 | 1,544.3 |
 
-The first eight public episodes were wins with both agents in `DONE` state and
-no non-empty stdout or stderr entries from V18. Eight matches are still too few
-for a stable comparison with established submissions, but the rating has moved
-from its 600 start to 1,393.2.
+The first 11 public episodes finished 10-1 with both agents in `DONE` state and
+no non-empty stdout or stderr entries from V18. Eleven matches are still too
+few for a stable comparison with established submissions, but the rating has
+moved from its 600 start to 1,544.3. The first loss was only 595 coins and is
+retained as a fresh diagnostic rather than tuned immediately.
 
 The downloaded replay and logs are retained in the ignored `replays/` and
 `logs/` directories for local analysis.
