@@ -25,6 +25,17 @@ accumulate.
 The downloaded replay and logs are retained in the ignored `replays/` and
 `logs/` directories for local analysis.
 
+## Public matches
+
+| Episode | Opponent | Result | Reward | Opponent reward | Margin | Rating after match |
+|---:|---|---|---:|---:|---:|---:|
+| 90125235 | Emre | win | 192,692 | 16,486 | +176,206 | 687.1 |
+
+The first public match completed with both agents in `DONE` state and no
+non-empty stdout or stderr entries from V21. One blowout is plumbing and
+initial-calibration evidence, not enough to compare V21 with V18's established
+rating.
+
 ## Release disposition
 
 The exact submitted artifact passed 77 repository tests, isolated both-seat
