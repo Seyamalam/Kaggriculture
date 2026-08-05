@@ -26,11 +26,15 @@ rating, not a measured public win/loss result.
 | 90109603 | huanxian chen | win | 165,809 | 52,827 | +112,982 | — |
 | 90110271 | typeIIIfairy | win | 103,151 | 81,025 | +22,126 | — |
 | 90110946 | Manish Kumar | win | 133,704 | 67,798 | +65,906 | 1,014.9 |
+| 90111614 | Jiarui (Jerry) Cao | win | 117,813 | 114,768 | +3,045 | 1,079.3 |
+| 90112297 | Enrico Ambrosio | win | 129,474 | 106,888 | +22,586 | 1,198.4 |
+| 90112969 | Furina | win | 142,055 | 131,921 | +10,134 | 1,282.3 |
+| 90113641 | Ayodeji | win | 153,147 | 140,240 | +12,907 | 1,393.2 |
 
-The first four public episodes were wins with both agents in `DONE` state and
-no non-empty stdout or stderr entries from V18. Four matches are still too few
+The first eight public episodes were wins with both agents in `DONE` state and
+no non-empty stdout or stderr entries from V18. Eight matches are still too few
 for a stable comparison with established submissions, but the rating has moved
-from its 600 start to 1,014.9.
+from its 600 start to 1,393.2.
 
 The downloaded replay and logs are retained in the ignored `replays/` and
 `logs/` directories for local analysis.

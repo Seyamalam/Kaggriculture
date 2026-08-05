@@ -160,6 +160,37 @@ As with the leader benchmark, this is comparative open-loop evidence. The
 recorded trace cannot adapt after either policy diverges, so the result is a
 reproducible regression screen rather than a live win-rate estimate.
 
+## Attribute replay losses
+
+After freezing a comparative corpus report, one command can re-run its exact
+candidate, baseline, engine, replay bytes, seeds, configurations, and selected
+action traces with deeper market attribution:
+
+```bash
+uv run python scripts/replay_loss_attribution.py \
+  --comparison artifacts/v18-standalone-v7-public55.json \
+  --candidate main.py \
+  --baseline agents/candidate_v7_public_v18.py \
+  --replays-dir artifacts/v7-public-replays \
+  --exclude-team 'Touhidul Alam Seyam' \
+  --checkpoints 289,433,577,719 \
+  --windows 289:433,433:577,577:719
+```
+
+The ignored JSON/Markdown report records engine-committed SELL units and
+realized revenue by product, demand phase, actor, and window; checkpoint bank
+and margin curves; own-bank versus opponent-denial decomposition; and rescued,
+harmed-to-loss, and unresolved-loss strata. Checkpoint public state is labelled
+online-safe separately for each policy; candidate-minus-baseline checkpoint
+deltas are retrospective counterfactuals. Engine commit events are exact
+diagnostics but are not directly observable by a live policy; window effects,
+outcomes, and final footprints are labelled retrospective. Day and demand-phase
+metrics derive `turnsPerDay`, `townShopSellInterval`, and
+`townCenterSellInterval` from each replay configuration, falling back to the
+engine defaults of 24/4/12 only when fields are absent. A digest-pinned input manifest and repeated mutation
+checks prevent candidate, baseline, comparison, or replay drift during the
+long-running audit. Narrow `--pattern` for a manifest-verified smoke subset.
+
 ## Submit
 
 `main.py` exposes the required top-level `agent(obs)` function and uses only the standard library.
