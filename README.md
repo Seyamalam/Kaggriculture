@@ -44,6 +44,7 @@ market-price-capture diagnosis.
 | `THIRD_PARTY_NOTICES.md` | Attribution and per-file licenses for imported public policies |
 | `scripts/tournament.py` | Seeded, slot-swapped local evaluation harness |
 | `scripts/leaderboard_benchmark.py` | Live top-ladder public replay-trace benchmark |
+| `scripts/comparative_replay_corpus.py` | Candidate-versus-baseline gate over a local replay corpus |
 | `tests/` | Full-episode validity and self-play tests |
 | `docs/competition.md` | Competition mechanics, evaluation, timeline, and submission contract |
 | `docs/rules.md` | Implementation-focused rules summary |
@@ -97,10 +98,14 @@ uv run python scripts/leaderboard_benchmark.py \
   --episodes-per-team 1
 ```
 
-The command writes `artifacts/leaderboard-benchmark.json` and `.md`. Increase
-`--top` or `--episodes-per-team` for a broader, slower screen. To compare a new
-candidate against the exact same teams and episode seeds without refreshing the
-API, reuse the saved snapshot and choose different output paths:
+The command writes `artifacts/leaderboard-benchmark.json` and `.md`. Its
+immutable corpus manifest records the UTC capture cutoff, installed engine,
+distinct leaderboard and submission ratings, and a composite identity for every
+`(submission, episode, recorded seat)` trace. Replay bytes, configuration, and
+the selected action stream are SHA-256 digested. Increase `--top` or
+`--episodes-per-team` for a broader, slower screen. To compare a new candidate
+against the exact same teams and episode seeds without refreshing the API,
+reuse the saved snapshot and choose different output paths:
 
 ```bash
 uv run python scripts/leaderboard_benchmark.py \
@@ -113,7 +118,53 @@ uv run python scripts/leaderboard_benchmark.py \
 This is an open-loop stress benchmark: recorded public actions do not adapt
 after our candidate changes the simulated state. It is useful for regression
 and adversarial screening, but it does not execute competitors' private source
-code and does not estimate live ladder win probability.
+code and does not estimate live ladder win probability. Snapshot reuse fails
+closed if the report/manifest schema, engine version, replay payload episode ID,
+file digest, configuration digest, or action-trace digest changed. Older
+pre-manifest reports must be recaptured with a live command. The summary reports
+both raw counts and source-episode-cluster-adjusted outcomes because two sampled
+teams can come from the same public match; paired-seat margin divergence makes
+the remaining open-loop/seat sensitivity visible. A candidate simulation error
+is retained as a trace error rather than removing that replay from the manifest,
+so the frozen corpus remains candidate-independent and can be retried from the
+same snapshot. Output paths are resolved before use and must not collide with
+the candidate, snapshot, each other, or the replay-cache tree.
+
+## Compare a candidate on the full local replay corpus
+
+The comparative corpus gate runs both the candidate and frozen baseline from
+both seats against every matching recorded trace, then reports the exact
+candidate-minus-baseline margin deltas. For the V7 public replay cache, identify
+the recorded opponent by excluding our team name:
+
+```bash
+uv run python scripts/comparative_replay_corpus.py \
+  --candidate agents/candidate_v8_market_order.py \
+  --baseline main.py \
+  --replays-dir artifacts/v7-public-replays \
+  --pattern 'episode-*-replay.json' \
+  --exclude-team 'Touhidul Alam Seyam'
+```
+
+The command writes ignored JSON and Markdown reports under `artifacts/`. It
+fails closed by default if a trace errors, either simulation is invalid, any
+seat comparison regresses, or the mean delta is negative. Experiments that
+intentionally tolerate bounded losses can set `--max-negative-comparisons` and
+`--min-mean-delta` explicitly. `--recorded-team` selects the named trace seat
+instead, while `--opponent-seat` is useful for corpora with missing or unstable
+team labels. Reports include per-trace seat deltas and summaries grouped by
+recorded team and final public farm footprint. A corpus manifest pins the
+installed engine, source seed, resolved recorded seat, replay byte digest and
+size, configuration digest, and selected action-trace digest. The command
+rejects duplicate `(episode, recorded seat)` identities, duplicate replay
+content, non-finite thresholds, and any resolved/symlinked collision among the
+candidate, baseline, replay inputs, JSON output, and Markdown output. Replay
+bytes are revalidated between the baseline and candidate runs so a file changed
+during a long gate fails closed instead of producing a mixed comparison.
+
+As with the leader benchmark, this is comparative open-loop evidence. The
+recorded trace cannot adapt after either policy diverges, so the result is a
+reproducible regression screen rather than a live win-rate estimate.
 
 ## Submit
 
